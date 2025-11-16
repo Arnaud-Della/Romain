@@ -1,0 +1,33 @@
+﻿@page "/converter"
+@inject IRomainConverterService RomainConverterService
+
+<PageTitle>Converter</PageTitle>
+
+<h1>Converter</h1>
+
+<input type="number" class="btn btn-primary" @oninput="OnInputChange" />
+
+@if (romanResult is not null)
+{
+    <p>@(romanResult.IsSuccess ? romanResult.Result : romanResult.Error!.Message)</p>
+}
+
+@code {
+    private ConvertResult? romanResult;
+
+    private void OnInputChange(ChangeEventArgs ev)
+    {
+        var value = ev.Value?.ToString();
+        bool isNumber = int.TryParse(value, out var number);
+        if (string.IsNullOrWhiteSpace(value) || !isNumber){
+            romanResult = new ConvertResult
+            {
+                IsSuccess = true,
+                Error = new ArgumentNullException("Input is not valid"),
+            };
+            return;
+        }
+
+        romanResult = RomainConverterService.ToRoman(number);
+    }
+}
